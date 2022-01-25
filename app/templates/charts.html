@@ -1,0 +1,231 @@
+{% include 'header.html' %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Charts</h1>
+          </div><!-- /.col -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Main row -->
+        <div class="row">
+
+          <section class="col-lg-12 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-header">
+			    <form action="{{ url_for('charts.index') }}" method="post">
+                  {{filter_form.hidden_tag()}}
+                  <div class="row">
+                    <div class="col-md-7">
+                      <h3 class="card-title">
+                        <i class="far fa-chart-bar"></i>
+                        Main Chart
+                      </h3>
+                    </div>
+
+                    <div class="col-md-2">
+                      {{filter_form.filter_from(class="form-control")}}
+                    </div>
+
+                    <div class="col-md-2">
+                      {{filter_form.filter_to(class="form-control")}}
+                    </div>
+
+                    <div class="col-md-1">
+                      {{filter_form.filter_submit(class="btn btn-primary")}}
+                    </div>
+
+                  </div>
+                </form>
+
+              </div><!-- /.card-header -->
+              <div class="card-body">
+
+                {% if error %}
+                <div class="alert alert-info alert-dismissible">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                  <h5><i class="icon fas fa-info"></i> Information</h5>
+                  Need 2 or more points to build a graph
+                </div>
+                {% else %}
+                <div class="chart">
+                  <canvas id="chart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+                {% endif %}
+              </div><!-- /.card-body -->
+
+            </div>
+
+          </section>
+        </div>
+
+        <div class="row">
+          <section class="col-lg-12 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-header">
+                <div class="row">
+                  <div class="col-md-12">
+                    <h3 class="card-title">
+                      <i class="far fa-chart-bar"></i>
+                      Linear Regression
+                    </h3>
+                  </div>
+                </div>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+
+                {% if error %}
+                <div class="alert alert-info alert-dismissible">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                  <h5><i class="icon fas fa-info"></i> Information</h5>
+                  Need 2 or more points to build a graph
+                </div>
+                {% else %}
+                <div class="chart">
+                  <canvas id="chart_regression" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+                {% endif %}
+              </div><!-- /.card-body -->
+
+            </div>
+          </section>
+        </div>
+        <!-- /.row (main row) -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+<!-- ChartJS -->
+{% if not error %}
+<script src="static/plugins/chart.js/Chart.min.js"></script>
+<script>
+  $(function () {
+    var area_chart_data = {
+      labels  : ['{{labels|safe}}'],
+      datasets: [
+        {
+          label               : 'Digital Goods',
+          backgroundColor     : 'rgba(60,141,188,0.9)',
+          borderColor         : 'rgba(60,141,188,0.8)',
+          pointRadius          : false,
+          // pointRadius: 5,
+          // showLine: false,
+          pointColor          : '#3b8bba',
+          pointStrokeColor    : 'rgba(60,141,188,1)',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data                : [{% for record in records %}{% if not loop.first %},{% endif %}{{record.costs}}{% endfor %}]
+        }
+      ]
+    }
+
+    var area_chart_options = {
+      maintainAspectRatio : false,
+      responsive : true,
+      legend: {
+        display: false
+      },
+      scales: {
+        xAxes: [{
+          gridLines : {
+            display : false,
+          }
+        }],
+        yAxes: [{
+          gridLines : {
+            display : false,
+          }
+        }]
+      }
+    }
+
+    var chart_canvas = $('#chart').get(0).getContext('2d');
+    var chart_options = $.extend(true, {}, area_chart_options);
+    var chart_data = $.extend(true, {}, area_chart_data);
+    chart_data.datasets[0].fill = false;
+    chart_options.datasetFill = false;
+
+    new Chart(chart_canvas, {
+      type: 'line',
+      data: chart_data,
+      options: chart_options
+    });
+
+    var area_chart_regression_data = {
+      labels  : ['{{labels_regression|safe}}'],
+      datasets: [
+        {
+          label               : '',
+          backgroundColor     : 'rgba(60,141,188,0.9)',
+          borderColor         : 'rgba(60,141,188,0.8)',
+          pointRadius         : 5,
+          showLine            : false,
+          pointColor          : '#3b8bba',
+          pointStrokeColor    : 'rgba(60,141,188,1)',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data                : [{{point_regression|safe}}]
+        },
+        {
+          label               : '',
+          backgroundColor     : 'rgba(210, 214, 222, 1)',
+          borderColor         : 'rgba(210, 214, 222, 1)',
+          pointRadius         : false,
+          pointColor          : 'rgba(210, 214, 222, 1)',
+          pointStrokeColor    : '#c1c7d1',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(220,220,220,1)',
+          data                : [{{line_regression|safe}}]
+        },
+      ]
+    }
+
+    var area_chart_regression_options = {
+      maintainAspectRatio : false,
+      responsive : true,
+      legend: {
+        display: false
+      },
+      scales: {
+        xAxes: [{
+          gridLines : {
+            display : false,
+          }
+        }],
+        yAxes: [{
+          gridLines : {
+            display : false,
+          }
+        }]
+      }
+    }
+
+    var chart_regression_canvas = $('#chart_regression').get(0).getContext('2d');
+    var chart_regression_options = $.extend(true, {}, area_chart_regression_options);
+    var chart_regression_data = $.extend(true, {}, area_chart_regression_data);
+    chart_regression_data.datasets[0].fill = false;
+    chart_regression_data.datasets[1].fill = false;
+    chart_regression_options.datasetFill = false;
+
+    new Chart(chart_regression_canvas, {
+      type: 'line',
+      data: chart_regression_data,
+      options: chart_regression_options
+    });
+  });
+</script>
+{% endif %}
+{% include 'footer.html' %}

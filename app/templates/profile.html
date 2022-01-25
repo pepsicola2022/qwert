@@ -1,0 +1,149 @@
+{% include 'header.html' %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Records</h1>
+          </div><!-- /.col -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">        
+        <!-- Main row -->
+        <div class="row">
+          <!-- Left col -->
+          <section class="col-lg-4 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-plus mr-1"></i>
+                  New Record
+                </h3>
+              </div><!-- /.card-header -->
+              <form action="/profile" method="post">
+              {{record_form.hidden_tag()}}
+              <div class="card-body">
+			  
+                <div class="form-group">
+                  {{record_form.income.label}}
+                  {{record_form.income(class="form-control" ~ (" is-invalid" if record_form.income.errors else ""), placeholder="Enter income")}}
+                </div>
+				
+                <div class="form-group">
+                  {{record_form.costs.label}}
+                  {{record_form.costs(class="form-control" ~ (" is-invalid" if record_form.costs.errors else ""), placeholder="Enter сosts")}}
+                </div>
+
+                <div class="form-group">
+                  {{record_form.date.label}}
+                  {{record_form.date(class="form-control" ~ (" is-invalid" if record_form.date.errors else ""))}}
+                </div>
+				
+                <div class="form-group">
+                  {{record_form.reason.label}}
+                  {{record_form.reason(class="form-control" ~ (" is-invalid" if record_form.reason.errors else ""), placeholder="Enter reason")}}
+                </div>
+
+                <div class="form-group">
+                  {{record_form.category.label}}
+                  {{record_form.category(class="form-control")}}
+                </div>
+				
+              </div><!-- /.card-body -->
+
+              <div class="card-footer">
+                {{record_form.submit(class = "btn btn-primary")}}
+              </div>
+			  </form>
+            </div>
+            <!-- /.card -->
+          </section>
+
+          <section class="col-lg-8 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="card">
+              <div class="card-header">
+			    <form action="/profile" method="post">
+                  {{filter_form.hidden_tag()}}
+                  <div class="row">
+                    <div class="col-md-5">
+                      <h3 class="card-title">
+                        <i class="fas fa-plus mr-1"></i> Records
+                      </h3>
+                    </div>
+
+                    <div class="col-md-2">
+                      {{filter_form.filter_from(class="form-control")}}
+                    </div>
+
+                    <div class="col-md-2">
+                      {{filter_form.filter_to(class="form-control")}}
+                    </div>
+
+                    <div class="col-md-2">
+                      {{filter_form.filter_category(class="form-control")}}
+                    </div>
+
+                    <div class="col-md-1">
+                      {{filter_form.filter_submit(class="btn btn-primary")}}
+                    </div>
+
+                  </div>
+                </form>
+                
+              </div><!-- /.card-header -->
+              <div class="card-body">
+
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th style="width: 10px">#</th>
+                      <th>Income</th>
+                      <th>Costs</th>
+					  <th>Date and time</th>
+					  <th>Reason</th>
+					  <th>Category</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for record in records %}
+                    <tr>
+                      <td>{{loop.index}}.</td>
+                      <td>{{record.income | costFormat}}</td>
+					  <td>{{record.costs | costFormat}}</td>
+					  <td>{{record.date | dateFormat}}</td>
+					  <td>{{record.reason}}</td>
+					  <td>{{record.name}}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+
+
+              </div><!-- /.card-body -->
+			  
+            </div>            
+
+            
+          </section>
+          <!-- /.Left col -->
+          <!-- right col (We are only adding the ID to make the widgets sortable)-->
+          
+          <!-- right col -->
+        </div>
+        <!-- /.row (main row) -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{% include 'footer.html' %}
